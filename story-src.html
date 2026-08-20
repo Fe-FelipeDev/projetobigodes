@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Projeto Bigodes — Story de Adoção (modelo oficial)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --vinho:#670f26; --laranja:#f37b03; --creme:#fff7e8; --borda:#e9dcc9; --escuro:#3B2A20;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{font-family:'Poppins',sans-serif; background:#F5EDE0; color:var(--escuro); min-height:100vh;}
+  header.topo{background:var(--vinho); color:var(--creme); padding:14px 28px; display:flex; align-items:center; gap:12px;}
+  header.topo h1{font-size:20px; font-weight:700;}
+  header.topo span{opacity:.75; font-size:13px;}
+  .wrap{display:grid; grid-template-columns: 400px 1fr; gap:24px; padding:24px 28px; max-width:1150px; margin:0 auto;}
+  @media(max-width:940px){ .wrap{grid-template-columns:1fr;} }
+
+  .painel{background:#fff; border:1px solid var(--borda); border-radius:14px; padding:20px;}
+  .painel h2{font-size:16px; font-weight:700; margin-bottom:12px;}
+
+  label{display:block; font-size:12px; font-weight:600; margin:12px 0 4px; color:#6b5748;}
+  input[type=text], select, textarea{
+    width:100%; padding:9px 10px; border:1px solid var(--borda); border-radius:8px;
+    font-family:'Poppins',sans-serif; font-size:13px; color:var(--escuro); background:#FFFDF9;}
+  input[type=range]{width:100%;}
+  .linha{display:flex; gap:10px;}
+  .linha > div{flex:1;}
+
+  .foto-controles{background:#FAF5EC; border:1px solid var(--borda); border-radius:10px; padding:10px 12px; margin-top:8px;}
+  .foto-controles label{margin-top:6px;}
+
+  .acoes{display:flex; flex-direction:column; gap:10px; margin-top:20px;}
+  .btn{padding:13px; border:none; border-radius:10px; font-family:'Poppins',sans-serif;
+    font-size:14px; font-weight:600; cursor:pointer;}
+  .btn-primario{background:var(--laranja); color:#fff;}
+  .btn-primario:hover{background:#d96e02;}
+  .btn-mini{padding:6px 10px; font-size:12px; border-radius:8px; border:1px solid var(--borda);
+    background:#fff; cursor:pointer; font-family:'Poppins',sans-serif;}
+
+  .preview-col{display:flex; flex-direction:column; gap:16px;}
+  .preview-box{background:#fff; border:1px solid var(--borda); border-radius:14px; padding:20px; display:flex; justify-content:center;}
+  #cv{width:100%; max-width:420px; height:auto; border-radius:8px; box-shadow:0 4px 24px rgba(59,42,32,.18);}
+
+  .msg-box textarea{min-height:140px; font-size:12.5px; resize:vertical;}
+  .msg-box .top{display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;}
+
+  .aviso{font-size:12px; color:#8a7a6c; margin-top:8px; line-height:1.5;}
+  #status{font-size:13px; font-weight:600; margin-top:4px; min-height:18px;}
+  #status.ok{color:#3f8f5f;} #status.erro{color:#c0392b;}
+
+  body.debug header, body.debug .painel.form, body.debug .msg-box{display:none;}
+  body.debug .wrap{display:block; padding:0; max-width:none;}
+  body.debug .preview-box{border:none; padding:0; background:none;}
+  body.debug #cv{max-width:540px; border-radius:0; box-shadow:none;}
+</style>
+</head>
+<body>
+
+<header class="topo">
+  <h1>🐾 Story de Adoção — modelo oficial Bigodes</h1>
+  <span>troque a foto e os dados; o resto do modelo fica intacto</span>
+</header>
+
+<div class="wrap">
+  <!-- ==================== FORMULÁRIO ==================== -->
+  <div class="painel form">
+    <h2>Dados do gato</h2>
+
+    <label>Foto</label>
+    <input type="file" id="foto" accept="image/*">
+    <div class="foto-controles">
+      <label>Zoom</label><input type="range" id="zoom" min="1" max="3" step="0.01" value="1">
+      <div class="linha">
+        <div><label>Posição horizontal</label><input type="range" id="ox" min="-1" max="1" step="0.01" value="0"></div>
+        <div><label>Posição vertical</label><input type="range" id="oy" min="-1" max="1" step="0.01" value="0"></div>
+      </div>
+    </div>
+
+    <div class="linha">
+      <div><label>Sexo</label>
+        <select id="sexo">
+          <option>Macho</option><option>Fêmea</option><option selected>Indefinido</option>
+        </select>
+      </div>
+      <div><label>Idade</label>
+        <input type="text" id="idade" value="2 meses">
+      </div>
+    </div>
+
+    <label>Castração (texto do balão da direita)</label>
+    <input type="text" id="castracao" value="Castração Garantida">
+
+    <label>Nome (só para a mensagem do WhatsApp — não aparece na arte)</label>
+    <input type="text" id="nome" placeholder="Ex.: Frajola">
+
+    <div class="linha">
+      <div><label>Contato</label><input type="text" id="contato" value="(35)9733-9504"></div>
+      <div><label>@ do Instagram</label><input type="text" id="handle" value="@projetobigodes_"></div>
+    </div>
+
+    <div class="acoes">
+      <button class="btn btn-primario" id="btnBaixar">⬇️ Baixar imagem pra enviar no WhatsApp</button>
+      <div id="status"></div>
+      <p class="aviso">A arte é o seu modelo original (SVG) — só a foto e os textos dos balões são trocados.
+      Depois é só anexar a imagem no WhatsApp e colar a mensagem pronta como legenda.</p>
+    </div>
+  </div>
+
+  <!-- ==================== PREVIEW ==================== -->
+  <div class="preview-col">
+    <div class="preview-box">
+      <canvas id="cv" width="1080" height="1920"></canvas>
+    </div>
+    <div class="painel msg-box">
+      <div class="top">
+        <h2>Mensagem pronta (legenda do WhatsApp)</h2>
+        <button class="btn-mini" id="btnCopiar">📋 Copiar</button>
+      </div>
+      <textarea id="mensagem" spellcheck="false"></textarea>
+    </div>
+  </div>
+</div>
+
+<script type="text/plain" id="tpl"><!--SVG_MODELO--></script>
+
+<script>
+"use strict";
+const $ = id => document.getElementById(id);
+const cv = $('cv'), ctx = cv.getContext('2d');
+if (new URLSearchParams(location.search).has('debug')) document.body.classList.add('debug');
+
+/* Escala: o SVG usa coordenadas 810×1440; o canvas é 1080×1920 (×4/3). */
+const K = 1080 / 810;
+
+/* Caixa do círculo da foto, em coordenadas locais do grupo transform(102,378) do SVG. */
+const FOTO_BOX = { x: 0.414, y: 0.527, w: 627.246, h: 615.23 };
+
+/* Transforms exatos (como estão no arquivo) dos grupos de texto variável a remover. */
+const GRUPOS_TEXTO = [
+  'matrix(1, 0, 0, 1, 105, 1034)',  // sexo
+  'matrix(1, 0, 0, 1, 522, 1026)',  // castração (2 linhas)
+  'matrix(1, 0, 0, 1, 337, 1186)',  // idade
+  'matrix(1, 0, 0, 1, 238, 1284)',  // contato (2 linhas)
+  'matrix(1, 0, 0, 1, 299, 1396)'   // @ do instagram
+];
+
+let fotoDataUrl = null, fotoW = 0, fotoH = 0;
+let baseImg = null;           // SVG renderizado (sem os textos variáveis)
+let msgEditada = false;
+let renderPendente = false;
+
+const svgOriginal = $('tpl').textContent;
+const parser = new DOMParser();
+
+function href(el){ return el.getAttribute('xlink:href') || el.getAttributeNS('http://www.w3.org/1999/xlink', 'href'); }
+
+/* Monta o SVG: remove textos variáveis e, se houver foto nova, troca a foto do círculo. */
+function montarSvg(){
+  const doc = parser.parseFromString(svgOriginal, 'image/svg+xml');
+
+  doc.querySelectorAll('g[transform]').forEach(g => {
+    if (GRUPOS_TEXTO.includes(g.getAttribute('transform'))) g.remove();
+  });
+
+  if (fotoDataUrl){
+    const imgs = [...doc.querySelectorAll('image')];
+    const fotoEl = imgs.find(el => (href(el) || '').startsWith('data:image/jpeg'));
+    if (fotoEl){
+      const s = Math.max(FOTO_BOX.w / fotoW, FOTO_BOX.h / fotoH) * +$('zoom').value;
+      const dw = fotoW * s, dh = fotoH * s;
+      const tx = FOTO_BOX.x + (FOTO_BOX.w - dw) / 2 + $('ox').value * (dw - FOTO_BOX.w) / 2;
+      const ty = FOTO_BOX.y + (FOTO_BOX.h - dh) / 2 + $('oy').value * (dh - FOTO_BOX.h) / 2;
+      fotoEl.setAttribute('width', fotoW);
+      fotoEl.setAttribute('height', fotoH);
+      fotoEl.setAttribute('xlink:href', fotoDataUrl);
+      fotoEl.parentElement.setAttribute('transform', `matrix(${s}, 0, 0, ${s}, ${tx}, ${ty})`);
+    }
+  }
+  return new XMLSerializer().serializeToString(doc);
+}
+
+function carregarBase(){
+  return new Promise((resolve, reject) => {
+    const blob = new Blob([montarSvg()], { type: 'image/svg+xml' });
+    const url = URL.createObjectURL(blob);
+    const img = new Image();
+    img.onload = () => { URL.revokeObjectURL(url); baseImg = img; resolve(); };
+    img.onerror = e => { URL.revokeObjectURL(url); reject(e); };
+    img.src = url;
+  });
+}
+
+/* ---------- textos por cima (coordenadas no espaço 810×1440 do SVG) ---------- */
+function textoAjustado(texto, cx, baseY, fonte, tamanho, maxW, cor){
+  let t = tamanho;
+  ctx.font = `700 ${t}px ${fonte}`;
+  while (ctx.measureText(texto).width > maxW && t > 16){
+    t -= 1; ctx.font = `700 ${t}px ${fonte}`;
+  }
+  ctx.fillStyle = cor; ctx.textAlign = 'center';
+  ctx.fillText(texto, cx, baseY);
+}
+
+function duasLinhas(texto){
+  const palavras = texto.split(/\s+/).filter(Boolean);
+  if (palavras.length < 2) return [texto];
+  let melhor = 0, menor = Infinity;
+  for (let i = 1; i < palavras.length; i++){
+    const a = palavras.slice(0, i).join(' '), b = palavras.slice(i).join(' ');
+    const d = Math.abs(a.length - b.length);
+    if (d < menor){ menor = d; melhor = i; }
+  }
+  return [palavras.slice(0, melhor).join(' '), palavras.slice(melhor).join(' ')];
+}
+
+function desenharTextos(){
+  ctx.save();
+  ctx.scale(K, K);
+  const PRETO = '#0b0a0c';
+
+  // sexo — balão da esquerda
+  textoAjustado($('sexo').value, 215, 1075.7, 'Poppins', 38, 235, PRETO);
+
+  // castração — balão da direita (1 ou 2 linhas)
+  const linhas = duasLinhas($('castracao').value || '');
+  if (linhas.length === 1){
+    textoAjustado(linhas[0], 631, 1086, 'Poppins', 38, 230, PRETO);
+  } else {
+    textoAjustado(linhas[0], 631, 1065.7, 'Poppins', 38, 230, PRETO);
+    textoAjustado(linhas[1], 631, 1105.9, 'Poppins', 38, 230, PRETO);
+  }
+
+  // idade — balão de baixo
+  textoAjustado($('idade').value || '', 417, 1225, 'Poppins', 38, 225, PRETO);
+
+  // contato
+  textoAjustado('Entre em contato:', 402, 1322.2, 'Poppins', 32, 330, '#fdfcfc');
+  textoAjustado($('contato').value || '', 402, 1370.3, 'Poppins', 32, 330, '#fdfcfc');
+
+  // @ do instagram (com espaçamento entre letras, como no modelo)
+  ctx.save();
+  try { ctx.letterSpacing = '5.5px'; } catch(e){}
+  textoAjustado($('handle').value || '', 409, 1413.2, 'Poppins', 13, 240, '#fff7e8');
+  ctx.restore();
+
+  ctx.restore();
+}
+
+function desenhar(){
+  if (!baseImg) return;
+  ctx.clearRect(0, 0, 1080, 1920);
+  ctx.drawImage(baseImg, 0, 0, 1080, 1920);
+  desenharTextos();
+}
+
+async function rebuildFoto(){
+  if (renderPendente) return;
+  renderPendente = true;
+  requestAnimationFrame(async () => {
+    renderPendente = false;
+    await carregarBase();
+    desenhar();
+  });
+}
+
+/* ---------- mensagem pronta ---------- */
+function gerarMensagem(){
+  const n = $('nome').value;
+  const f = $('sexo').value === 'Fêmea';
+  const partes = [$('sexo').value, $('castracao').value, $('idade').value].filter(Boolean);
+  return `🐾 ${n ? `*${n}* está` : 'Gatinh' + (f ? 'a' : 'o')} para adoção!\n\n` +
+    `🐈 ${partes.join(' • ')}\n\n` +
+    `Adoção responsável pelo Projeto Bigodes. 🧡\n\n` +
+    `📩 Entre em contato: ${$('contato').value}\n` +
+    `📷 Instagram: ${$('handle').value}`;
+}
+function atualizarMensagem(){ if (!msgEditada) $('mensagem').value = gerarMensagem(); }
+
+/* ---------- eventos ---------- */
+$('foto').addEventListener('change', e => {
+  const f = e.target.files && e.target.files[0];
+  if (!f) return;
+  const leitor = new FileReader();
+  leitor.onload = () => {
+    const probe = new Image();
+    probe.onload = () => {
+      fotoDataUrl = leitor.result; fotoW = probe.width; fotoH = probe.height;
+      $('zoom').value = 1; $('ox').value = 0; $('oy').value = 0;
+      rebuildFoto();
+    };
+    probe.src = leitor.result;
+  };
+  leitor.readAsDataURL(f);
+});
+
+['zoom','ox','oy'].forEach(id => $(id).addEventListener('input', rebuildFoto));
+['sexo','idade','castracao','nome','contato','handle'].forEach(id =>
+  $(id).addEventListener('input', () => { atualizarMensagem(); desenhar(); }));
+$('mensagem').addEventListener('input', () => { msgEditada = true; });
+
+$('btnCopiar').addEventListener('click', async () => {
+  await navigator.clipboard.writeText($('mensagem').value);
+  const s = $('status'); s.textContent = '✓ Mensagem copiada — cole como legenda no WhatsApp.'; s.className = 'ok';
+});
+
+$('btnBaixar').addEventListener('click', async () => {
+  desenhar();
+  const blob = await new Promise(r => cv.toBlob(r, 'image/jpeg', 0.92));
+  const nome = ($('nome').value || 'gato').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '')
+    .replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'gato';
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob); a.download = `adote-${nome}.jpg`;
+  document.body.appendChild(a); a.click(); a.remove();
+  const s = $('status'); s.textContent = '✓ Imagem baixada — anexe no WhatsApp.'; s.className = 'ok';
+});
+
+/* ---------- init ---------- */
+atualizarMensagem();
+(async () => {
+  await document.fonts.load("700 38px Poppins").catch(() => {});
+  await document.fonts.ready;
+  await carregarBase();
+  desenhar();
+})();
+</script>
+</body>
+</html>

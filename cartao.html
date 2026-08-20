@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Projeto Bigodes — Cartão de Adoção (WhatsApp)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --vinho:#670f26; --laranja:#f37b03; --creme:#fff7e8; --borda:#e9dcc9; --escuro:#3B2A20;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{font-family:'Poppins',sans-serif; background:#F5EDE0; color:var(--escuro); min-height:100vh;}
+  header.topo{background:var(--vinho); color:var(--creme); padding:14px 28px; display:flex; align-items:center; gap:12px;}
+  header.topo h1{font-family:'Baloo 2',cursive; font-size:22px; font-weight:700;}
+  header.topo span{opacity:.75; font-size:13px;}
+  .wrap{display:grid; grid-template-columns: 400px 1fr; gap:24px; padding:24px 28px; max-width:1200px; margin:0 auto;}
+  @media(max-width:940px){ .wrap{grid-template-columns:1fr;} }
+
+  .painel{background:#fff; border:1px solid var(--borda); border-radius:14px; padding:20px;}
+  .painel h2{font-family:'Baloo 2',cursive; font-size:17px; margin-bottom:12px;}
+
+  label{display:block; font-size:12px; font-weight:600; margin:12px 0 4px; color:#6b5748;}
+  input[type=text], select, textarea{
+    width:100%; padding:9px 10px; border:1px solid var(--borda); border-radius:8px;
+    font-family:'Poppins',sans-serif; font-size:13px; color:var(--escuro); background:#FFFDF9;}
+  input[type=range]{width:100%;}
+  .linha{display:flex; gap:10px;}
+  .linha > div{flex:1;}
+
+  .foto-controles{background:#FAF5EC; border:1px solid var(--borda); border-radius:10px; padding:10px 12px; margin-top:8px;}
+  .foto-controles label{margin-top:6px;}
+
+  .acoes{display:flex; flex-direction:column; gap:10px; margin-top:20px;}
+  .btn{padding:13px; border:none; border-radius:10px; font-family:'Poppins',sans-serif;
+    font-size:14px; font-weight:600; cursor:pointer;}
+  .btn-primario{background:var(--laranja); color:#fff;}
+  .btn-primario:hover{background:#d96e02;}
+  .btn-sec{background:#EFE6D6; color:var(--escuro);}
+  .btn-mini{padding:6px 10px; font-size:12px; border-radius:8px; border:1px solid var(--borda);
+    background:#fff; cursor:pointer; font-family:'Poppins',sans-serif;}
+
+  .preview-col{display:flex; flex-direction:column; gap:16px;}
+  .preview-box{background:#fff; border:1px solid var(--borda); border-radius:14px; padding:20px; display:flex; justify-content:center;}
+  #cv{width:100%; max-width:520px; height:auto; border-radius:8px; box-shadow:0 4px 24px rgba(59,42,32,.18);}
+
+  .msg-box textarea{min-height:150px; font-size:12.5px; resize:vertical;}
+  .msg-box .top{display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;}
+
+  .aviso{font-size:12px; color:#8a7a6c; margin-top:8px; line-height:1.5;}
+  #status{font-size:13px; font-weight:600; margin-top:4px; min-height:18px;}
+  #status.ok{color:#3f8f5f;}
+</style>
+</head>
+<body>
+
+<header class="topo">
+  <h1>🐾 Projeto Bigodes — Cartão de Adoção</h1>
+  <span>gere a imagem, baixe e envie no WhatsApp</span>
+</header>
+
+<div class="wrap">
+  <!-- ==================== FORMULÁRIO ==================== -->
+  <div class="painel">
+    <h2>Dados do gato</h2>
+
+    <label>Foto</label>
+    <input type="file" id="foto" accept="image/*">
+    <div class="foto-controles">
+      <label>Zoom</label><input type="range" id="zoom" min="1" max="2.5" step="0.01" value="1">
+      <div class="linha">
+        <div><label>Posição horizontal</label><input type="range" id="ox" min="-1" max="1" step="0.01" value="0"></div>
+        <div><label>Posição vertical</label><input type="range" id="oy" min="-1" max="1" step="0.01" value="0"></div>
+      </div>
+    </div>
+
+    <label>Nome</label>
+    <input type="text" id="nome" placeholder="Ex.: Frajola">
+
+    <div class="linha">
+      <div><label>Sexo</label>
+        <select id="sexo"><option value="Macho">Macho</option><option value="Fêmea">Fêmea</option></select>
+      </div>
+      <div><label>Castração</label>
+        <select id="castracao">
+          <option value="sim">Castrado(a)</option>
+          <option value="nao">Ainda não castrado(a)</option>
+          <option value="filhote">Castração por conta da ONG</option>
+        </select>
+      </div>
+    </div>
+    <label>Idade</label>
+    <input type="text" id="idade" placeholder="Ex.: 2 anos">
+
+    <label>Contato (rodapé do cartão)</label>
+    <input type="text" id="contato" value="Adote: (11) 90000-0000">
+
+    <div class="acoes">
+      <button class="btn btn-primario" id="btnBaixar">⬇️ Baixar imagem pra enviar no WhatsApp</button>
+      <div id="status"></div>
+      <p class="aviso">Depois é só abrir o WhatsApp, anexar a imagem baixada e, se quiser,
+      colar a mensagem pronta ao lado como legenda. Os asteriscos viram <b>negrito</b> no WhatsApp.</p>
+    </div>
+  </div>
+
+  <!-- ==================== PREVIEW ==================== -->
+  <div class="preview-col">
+    <div class="preview-box">
+      <canvas id="cv" width="1080" height="1080"></canvas>
+    </div>
+    <div class="painel msg-box">
+      <div class="top">
+        <h2>Mensagem pronta (legenda do WhatsApp)</h2>
+        <button class="btn-mini" id="btnCopiar">📋 Copiar</button>
+      </div>
+      <textarea id="mensagem" spellcheck="false"></textarea>
+    </div>
+  </div>
+</div>
+
+<script>
+"use strict";
+const $ = id => document.getElementById(id);
+const cv = $('cv'), ctx = cv.getContext('2d');
+const W = 1080, H = 1080;
+
+const VINHO = '#670f26', LARANJA = '#f37b03', CREME = '#fff7e8';
+
+let img = null;
+let msgEditada = false;
+
+/* ---------- utilidades de desenho ---------- */
+function rr(x, y, w, h, r){
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.arcTo(x + w, y, x + w, y + h, r);
+  ctx.arcTo(x + w, y + h, x, y + h, r);
+  ctx.arcTo(x, y + h, x, y, r);
+  ctx.arcTo(x, y, x + w, y, r);
+  ctx.closePath();
+}
+
+function drawCover(x, y, w, h, radius){
+  ctx.save();
+  rr(x, y, w, h, radius); ctx.clip();
+  if (img){
+    const s = Math.max(w / img.width, h / img.height) * +$('zoom').value;
+    const dw = img.width * s, dh = img.height * s;
+    const dx = x + (w - dw) / 2 + $('ox').value * (dw - w) / 2;
+    const dy = y + (h - dh) / 2 + $('oy').value * (dh - h) / 2;
+    ctx.drawImage(img, dx, dy, dw, dh);
+  } else {
+    const g = ctx.createLinearGradient(x, y, x + w, y + h);
+    g.addColorStop(0, '#8a2038'); g.addColorStop(1, '#4d0a1c');
+    ctx.fillStyle = g; ctx.fillRect(x, y, w, h);
+    ctx.fillStyle = 'rgba(255,247,232,.5)';
+    ctx.font = '600 30px Poppins';
+    ctx.textAlign = 'center';
+    ctx.fillText('adicione uma foto 🐱', x + w / 2, y + h / 2 + 60);
+    pata(x + w / 2, y + h / 2 - 40, 40, 'rgba(255,247,232,.35)');
+  }
+  ctx.restore();
+}
+
+function pata(x, y, s, cor){
+  ctx.fillStyle = cor;
+  ctx.beginPath(); ctx.ellipse(x, y + s * .35, s * .62, s * .5, 0, 0, 7); ctx.fill();
+  const dedos = [[-.62, -.28], [-.22, -.55], [.22, -.55], [.62, -.28]];
+  for (const [dx, dy] of dedos){
+    ctx.beginPath(); ctx.ellipse(x + dx * s, y + dy * s, s * .2, s * .26, 0, 0, 7); ctx.fill();
+  }
+}
+
+function pill(texto, cx, cy, fonte, corFundo, corTexto, padX, padY){
+  ctx.font = fonte;
+  const w = ctx.measureText(texto).width + padX * 2, h = padY * 2;
+  rr(cx - w / 2, cy - h / 2, w, h, h / 2);
+  ctx.fillStyle = corFundo; ctx.fill();
+  ctx.fillStyle = corTexto; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillText(texto, cx, cy + 2);
+  ctx.textBaseline = 'alphabetic';
+  return w;
+}
+
+/* ---------- textos que dependem do sexo ---------- */
+function femea(){ return $('sexo').value === 'Fêmea'; }
+function textoCastracao(){
+  const v = $('castracao').value, o = femea() ? 'a' : 'o';
+  if (v === 'sim') return `Castrad${o} ✓`;
+  if (v === 'filhote') return 'Castração pela ONG';
+  return `Ainda não castrad${o}`;
+}
+
+/* ---------- desenho do cartão ---------- */
+function render(){
+  ctx.clearRect(0, 0, W, H);
+
+  // fundo vinho com patinhas discretas
+  ctx.fillStyle = VINHO; ctx.fillRect(0, 0, W, H);
+  pata(70, 940, 26, 'rgba(255,247,232,.07)');
+  pata(1010, 900, 20, 'rgba(255,247,232,.07)');
+  pata(1020, 80, 24, 'rgba(255,247,232,.07)');
+  pata(150, 60, 18, 'rgba(255,247,232,.07)');
+
+  // cabeçalho
+  ctx.fillStyle = CREME;
+  ctx.font = "700 40px 'Baloo 2'"; ctx.textAlign = 'center';
+  ctx.fillText('🐾 Projeto Bigodes', W / 2, 74);
+
+  // foto
+  drawCover(70, 110, 940, 590, 28);
+
+  // selo ME ADOTE sobre a borda da foto
+  pill('ME ADOTE 🧡', W / 2, 700, "800 36px 'Baloo 2'", LARANJA, '#fff', 34, 32);
+
+  // nome
+  ctx.fillStyle = CREME; ctx.font = "800 86px 'Baloo 2'"; ctx.textAlign = 'center';
+  ctx.fillText($('nome').value || 'Nome do gato', W / 2, 835);
+
+  // chips: sexo • castração • idade
+  const chips = [$('sexo').value, textoCastracao()];
+  if ($('idade').value) chips.push($('idade').value);
+  ctx.font = '600 28px Poppins';
+  const gap = 16, larguras = chips.map(c => ctx.measureText(c).width + 52);
+  let x = W / 2 - (larguras.reduce((a, b) => a + b, 0) + gap * (chips.length - 1)) / 2;
+  chips.forEach((c, i) => {
+    pill(c, x + larguras[i] / 2, 905, '600 28px Poppins', CREME, VINHO, 26, 26);
+    x += larguras[i] + gap;
+  });
+
+  // rodapé
+  ctx.fillStyle = LARANJA; ctx.fillRect(0, H - 90, W, 90);
+  ctx.fillStyle = '#fff'; ctx.font = "700 30px 'Baloo 2'"; ctx.textAlign = 'center';
+  ctx.fillText($('contato').value || '', W / 2, H - 34);
+}
+
+/* ---------- mensagem pronta ---------- */
+function gerarMensagem(){
+  const n = $('nome').value || 'Este gatinho';
+  const o = femea() ? 'a' : 'o';
+  const partes = [$('sexo').value, textoCastracao().replace(' ✓', ''), $('idade').value].filter(Boolean);
+  return `🐾 *${n}* está para adoção!\n\n` +
+    `🐈 ${partes.join(' • ')}\n\n` +
+    `Resgatad${o} pelo Projeto Bigodes e prontinh${o} para encontrar uma família. 🧡\n\n` +
+    `📩 Interessados: ${$('contato').value || 'chame aqui no WhatsApp'}`;
+}
+function atualizarMensagem(){
+  if (msgEditada) return;
+  $('mensagem').value = gerarMensagem();
+}
+
+/* ---------- eventos ---------- */
+$('foto').addEventListener('change', e => {
+  const f = e.target.files && e.target.files[0];
+  if (!f) return;
+  const i = new Image();
+  i.onload = () => { img = i; render(); };
+  i.src = URL.createObjectURL(f);
+});
+
+document.querySelectorAll('input, select').forEach(el => {
+  el.addEventListener('input', () => { atualizarMensagem(); render(); });
+});
+$('mensagem').addEventListener('input', () => { msgEditada = true; });
+
+$('btnCopiar').addEventListener('click', async () => {
+  await navigator.clipboard.writeText($('mensagem').value);
+  const s = $('status'); s.textContent = '✓ Mensagem copiada — cole como legenda no WhatsApp.'; s.className = 'ok';
+});
+
+$('btnBaixar').addEventListener('click', async () => {
+  render();
+  const blob = await new Promise(r => cv.toBlob(r, 'image/jpeg', 0.92));
+  const nome = ($('nome').value || 'gato').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '')
+    .replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob); a.download = `adote-${nome || 'gato'}.jpg`;
+  document.body.appendChild(a); a.click(); a.remove();
+  const s = $('status'); s.textContent = '✓ Imagem baixada — anexe no WhatsApp.'; s.className = 'ok';
+});
+
+/* ---------- init ---------- */
+atualizarMensagem();
+render();
+document.fonts.ready.then(render);
+</script>
+</body>
+</html>
