@@ -1,8 +1,9 @@
 # Projeto Bigodes — Gerador de Arte de Adoção 🐾
 
-Editor online para gerar a arte de adoção do **Projeto Bigodes** no modelo oficial
-(story 1080×1920): troque a foto do gato e os textos (sexo, castração, idade),
-baixe o JPG e envie no WhatsApp com a mensagem pronta.
+Editor online para gerar as artes de adoção do **Projeto Bigodes** no modelo oficial:
+troque a foto do gato e os textos (sexo, castração, idade) e baixe **os dois formatos** —
+o story (1080×1920, o modelo original) e o quadrado do WhatsApp (1080×1080, remontado
+com recortes do próprio modelo) — junto com a mensagem pronta pra colar como legenda.
 
 ## Arquivos
 
@@ -11,7 +12,7 @@ baixe o JPG e envie no WhatsApp com a mensagem pronta.
 | `index.html` | **O editor** (publicado no GitHub Pages). Autocontido — o modelo SVG já está embutido. |
 | `story-src.html` | Código-fonte do editor, com o marcador `<!--SVG_MODELO-->` no lugar do SVG. |
 | `modelo/modelo-post-story.svg` | O modelo oficial da arte, exportado do editor de design. |
-| `cartao.html` | Versão alternativa em formato quadrado 1080×1080 (layout próprio). |
+| `cartao.html` | Protótipo antigo do cartão quadrado (layout próprio, não usa o modelo). |
 
 ## Como atualizar o editor quando o modelo SVG mudar
 

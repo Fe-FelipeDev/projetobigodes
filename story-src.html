@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Projeto Bigodes — Story de Adoção (modelo oficial)</title>
+<title>Projeto Bigodes — Gerador de Arte de Adoção</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -13,11 +13,11 @@
   }
   *{box-sizing:border-box; margin:0; padding:0;}
   body{font-family:'Poppins',sans-serif; background:#F5EDE0; color:var(--escuro); min-height:100vh;}
-  header.topo{background:var(--vinho); color:var(--creme); padding:14px 28px; display:flex; align-items:center; gap:12px;}
+  header.topo{background:var(--vinho); color:var(--creme); padding:14px 28px; display:flex; align-items:center; gap:12px; flex-wrap:wrap;}
   header.topo h1{font-size:20px; font-weight:700;}
   header.topo span{opacity:.75; font-size:13px;}
-  .wrap{display:grid; grid-template-columns: 400px 1fr; gap:24px; padding:24px 28px; max-width:1150px; margin:0 auto;}
-  @media(max-width:940px){ .wrap{grid-template-columns:1fr;} }
+  .wrap{display:grid; grid-template-columns: 400px 1fr; gap:24px; padding:24px 28px; max-width:1280px; margin:0 auto;}
+  @media(max-width:980px){ .wrap{grid-template-columns:1fr;} }
 
   .painel{background:#fff; border:1px solid var(--borda); border-radius:14px; padding:20px;}
   .painel h2{font-size:16px; font-weight:700; margin-bottom:12px;}
@@ -38,31 +38,46 @@
     font-size:14px; font-weight:600; cursor:pointer;}
   .btn-primario{background:var(--laranja); color:#fff;}
   .btn-primario:hover{background:#d96e02;}
+  .btn-sec{background:#EFE6D6; color:var(--escuro);}
+  .btn-sec:hover{background:#e5d8c2;}
   .btn-mini{padding:6px 10px; font-size:12px; border-radius:8px; border:1px solid var(--borda);
     background:#fff; cursor:pointer; font-family:'Poppins',sans-serif;}
 
   .preview-col{display:flex; flex-direction:column; gap:16px;}
-  .preview-box{background:#fff; border:1px solid var(--borda); border-radius:14px; padding:20px; display:flex; justify-content:center;}
-  #cv{width:100%; max-width:420px; height:auto; border-radius:8px; box-shadow:0 4px 24px rgba(59,42,32,.18);}
+  .previews{display:flex; gap:16px; align-items:flex-start; flex-wrap:wrap;}
+  .preview-box{background:#fff; border:1px solid var(--borda); border-radius:14px; padding:14px; flex:1; min-width:240px;}
+  .preview-box p{font-size:12px; font-weight:600; color:#6b5748; margin-bottom:8px; text-align:center;}
+  .preview-box canvas{width:100%; height:auto; border-radius:8px; box-shadow:0 4px 20px rgba(59,42,32,.18); display:block;}
 
-  .msg-box textarea{min-height:140px; font-size:12.5px; resize:vertical;}
+  .msg-box textarea{min-height:130px; font-size:12.5px; resize:vertical;}
   .msg-box .top{display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;}
 
   .aviso{font-size:12px; color:#8a7a6c; margin-top:8px; line-height:1.5;}
   #status{font-size:13px; font-weight:600; margin-top:4px; min-height:18px;}
   #status.ok{color:#3f8f5f;} #status.erro{color:#c0392b;}
 
-  body.debug header, body.debug .painel.form, body.debug .msg-box{display:none;}
+  /* modal de prévia */
+  #modal{display:none; position:fixed; inset:0; z-index:100; background:rgba(30,10,15,.92);
+    overflow:auto; padding:24px; text-align:center; cursor:zoom-out;}
+  #modal.aberto{display:block;}
+  #modal img{max-width:min(94vw,520px); height:auto; margin:10px; border-radius:10px;
+    box-shadow:0 8px 40px rgba(0,0,0,.5); vertical-align:top;}
+  #modal .dica{color:#fff7e8; font-size:13px; opacity:.8; margin-bottom:6px;}
+
+  body.debug header, body.debug .painel.form, body.debug .msg-box, body.debug .preview-box p{display:none;}
   body.debug .wrap{display:block; padding:0; max-width:none;}
-  body.debug .preview-box{border:none; padding:0; background:none;}
-  body.debug #cv{max-width:540px; border-radius:0; box-shadow:none;}
+  body.debug .previews{flex-wrap:nowrap; gap:0;}
+  body.debug .preview-box{border:none; padding:0; background:none; border-radius:0; flex:none; min-width:0;}
+  body.debug .preview-box canvas{border-radius:0; box-shadow:none;}
+  body.debug #boxStory canvas{width:405px;}
+  body.debug #boxQuad canvas{width:540px;}
 </style>
 </head>
 <body>
 
 <header class="topo">
-  <h1>🐾 Story de Adoção — modelo oficial Bigodes</h1>
-  <span>troque a foto e os dados; o resto do modelo fica intacto</span>
+  <h1>🐾 Projeto Bigodes — Gerador de Arte de Adoção</h1>
+  <span>preencha uma vez, gere o story e o quadrado do WhatsApp</span>
 </header>
 
 <div class="wrap">
@@ -91,7 +106,7 @@
       </div>
     </div>
 
-    <label>Castração (texto do balão da direita)</label>
+    <label>Castração (texto do balão)</label>
     <input type="text" id="castracao" value="Castração Garantida">
 
     <label>Nome (só para a mensagem do WhatsApp — não aparece na arte)</label>
@@ -103,17 +118,27 @@
     </div>
 
     <div class="acoes">
-      <button class="btn btn-primario" id="btnBaixar">⬇️ Baixar imagem pra enviar no WhatsApp</button>
+      <button class="btn btn-sec" id="btnPreview">👁️ Prévia em tamanho grande</button>
+      <button class="btn btn-primario" id="btnStory">⬇️ Baixar Story (1080×1920)</button>
+      <button class="btn btn-primario" id="btnQuad">⬇️ Baixar Quadrado (1080×1080)</button>
+      <button class="btn btn-primario" id="btnAmbos">⬇️⬇️ Baixar os dois</button>
       <div id="status"></div>
-      <p class="aviso">A arte é o seu modelo original (SVG) — só a foto e os textos dos balões são trocados.
-      Depois é só anexar a imagem no WhatsApp e colar a mensagem pronta como legenda.</p>
+      <p class="aviso">Ao baixar os dois, o navegador pode pedir permissão para “baixar vários arquivos” — é só permitir.
+      Depois anexe no WhatsApp e cole a mensagem pronta como legenda.</p>
     </div>
   </div>
 
-  <!-- ==================== PREVIEW ==================== -->
+  <!-- ==================== PREVIEWS ==================== -->
   <div class="preview-col">
-    <div class="preview-box">
-      <canvas id="cv" width="1080" height="1920"></canvas>
+    <div class="previews">
+      <div class="preview-box" id="boxStory">
+        <p>Story / Status (1080×1920)</p>
+        <canvas id="cvS" width="1080" height="1920"></canvas>
+      </div>
+      <div class="preview-box" id="boxQuad">
+        <p>Quadrado WhatsApp (1080×1080)</p>
+        <canvas id="cvQ" width="1080" height="1080"></canvas>
+      </div>
     </div>
     <div class="painel msg-box">
       <div class="top">
@@ -125,15 +150,18 @@
   </div>
 </div>
 
+<div id="modal"><p class="dica">clique em qualquer lugar para fechar</p></div>
+
 <script type="text/plain" id="tpl"><!--SVG_MODELO--></script>
 
 <script>
 "use strict";
 const $ = id => document.getElementById(id);
-const cv = $('cv'), ctx = cv.getContext('2d');
+const cvS = $('cvS'), ctxS = cvS.getContext('2d');
+const cvQ = $('cvQ'), ctxQ = cvQ.getContext('2d');
 if (new URLSearchParams(location.search).has('debug')) document.body.classList.add('debug');
 
-/* Escala: o SVG usa coordenadas 810×1440; o canvas é 1080×1920 (×4/3). */
+/* Escala: o SVG usa coordenadas 810×1440; o render base é 1080×1920 (×4/3). */
 const K = 1080 / 810;
 
 /* Caixa do círculo da foto, em coordenadas locais do grupo transform(102,378) do SVG. */
@@ -194,12 +222,12 @@ function carregarBase(){
   });
 }
 
-/* ---------- textos por cima (coordenadas no espaço 810×1440 do SVG) ---------- */
-function textoAjustado(texto, cx, baseY, fonte, tamanho, maxW, cor){
+/* ---------- utilidades de texto ---------- */
+function textoAjustado(ctx, texto, cx, baseY, tamanho, maxW, cor){
   let t = tamanho;
-  ctx.font = `700 ${t}px ${fonte}`;
-  while (ctx.measureText(texto).width > maxW && t > 16){
-    t -= 1; ctx.font = `700 ${t}px ${fonte}`;
+  ctx.font = `700 ${t}px Poppins`;
+  while (ctx.measureText(texto).width > maxW && t > 14){
+    t -= 1; ctx.font = `700 ${t}px Poppins`;
   }
   ctx.fillStyle = cor; ctx.textAlign = 'center';
   ctx.fillText(texto, cx, baseY);
@@ -217,45 +245,116 @@ function duasLinhas(texto){
   return [palavras.slice(0, melhor).join(' '), palavras.slice(melhor).join(' ')];
 }
 
-function desenharTextos(){
-  ctx.save();
-  ctx.scale(K, K);
-  const PRETO = '#0b0a0c';
+const PRETO = '#0b0a0c';
 
-  // sexo — balão da esquerda
-  textoAjustado($('sexo').value, 215, 1075.7, 'Poppins', 38, 235, PRETO);
+/* ---------- STORY: base + textos (coordenadas no espaço 810×1440) ---------- */
+function desenharStory(){
+  if (!baseImg) return;
+  ctxS.clearRect(0, 0, 1080, 1920);
+  ctxS.drawImage(baseImg, 0, 0, 1080, 1920);
 
-  // castração — balão da direita (1 ou 2 linhas)
+  ctxS.save();
+  ctxS.scale(K, K);
+
+  textoAjustado(ctxS, $('sexo').value, 215, 1075.7, 38, 235, PRETO);
+
   const linhas = duasLinhas($('castracao').value || '');
   if (linhas.length === 1){
-    textoAjustado(linhas[0], 631, 1086, 'Poppins', 38, 230, PRETO);
+    textoAjustado(ctxS, linhas[0], 631, 1086, 38, 230, PRETO);
   } else {
-    textoAjustado(linhas[0], 631, 1065.7, 'Poppins', 38, 230, PRETO);
-    textoAjustado(linhas[1], 631, 1105.9, 'Poppins', 38, 230, PRETO);
+    textoAjustado(ctxS, linhas[0], 631, 1065.7, 38, 230, PRETO);
+    textoAjustado(ctxS, linhas[1], 631, 1105.9, 38, 230, PRETO);
   }
 
-  // idade — balão de baixo
-  textoAjustado($('idade').value || '', 417, 1225, 'Poppins', 38, 225, PRETO);
+  textoAjustado(ctxS, $('idade').value || '', 417, 1225, 38, 225, PRETO);
 
-  // contato
-  textoAjustado('Entre em contato:', 402, 1322.2, 'Poppins', 32, 330, '#fdfcfc');
-  textoAjustado($('contato').value || '', 402, 1370.3, 'Poppins', 32, 330, '#fdfcfc');
+  textoAjustado(ctxS, 'Entre em contato:', 402, 1322.2, 32, 330, '#fdfcfc');
+  textoAjustado(ctxS, $('contato').value || '', 402, 1370.3, 32, 330, '#fdfcfc');
 
-  // @ do instagram (com espaçamento entre letras, como no modelo)
-  ctx.save();
-  try { ctx.letterSpacing = '5.5px'; } catch(e){}
-  textoAjustado($('handle').value || '', 409, 1413.2, 'Poppins', 13, 240, '#fff7e8');
-  ctx.restore();
+  ctxS.save();
+  try { ctxS.letterSpacing = '5.5px'; } catch(e){}
+  textoAjustado(ctxS, $('handle').value || '', 409, 1413.2, 13, 240, '#fff7e8');
+  ctxS.restore();
 
-  ctx.restore();
+  ctxS.restore();
 }
 
-function desenhar(){
+/* ---------- QUADRADO: recortes do render base remontados em 1080×1080 ----------
+   crop810: retângulo de origem no espaço 810×1440 do SVG; dest em pixels do quadrado. */
+function crop(sx, sy, sw, sh, dx, dy, escala){
+  ctxQ.drawImage(baseImg, sx * K, sy * K, sw * K, sh * K,
+    dx, dy, sw * K * escala, sh * K * escala);
+}
+
+function desenharQuadrado(){
   if (!baseImg) return;
-  ctx.clearRect(0, 0, 1080, 1920);
-  ctx.drawImage(baseImg, 0, 0, 1080, 1920);
-  desenharTextos();
+  ctxQ.fillStyle = '#670f26';
+  ctxQ.fillRect(0, 0, 1080, 1080);
+
+  // patinhas nos cantos superiores — par da trilha do rodapé do modelo, 810:(152,1332,138,60)
+  crop(152, 1332, 138, 60, 848, 26, 1.2);
+  ctxQ.save(); ctxQ.scale(-1, 1);
+  crop(152, 1332, 138, 60, -232, 26, 1.2); // espelhado no canto esquerdo
+  ctxQ.restore();
+
+  // logo "Bigodes adota" — fonte 810:(167,41,435,148)
+  crop(167, 41, 435, 148, 290, 26, 0.862);
+
+  // faixa "Adoção Responsável" — fonte 810:(96.78,247.2,616.7,94.2)
+  crop(96.78, 247.2, 616.7, 94.2, 190, 222, 0.8513); // 822×125.6 → 700×107
+
+  // círculo da foto com anel branco — fonte 810:(99,375,634,622); o clip elíptico
+  // descarta os topos dos corações do story que invadem os cantos do retângulo
+  const cs = 0.56;
+  ctxQ.save();
+  ctxQ.beginPath();
+  ctxQ.ellipse(540, 565, 237, 233, 0, 0, 2 * Math.PI);
+  ctxQ.clip();
+  crop(99, 375, 634, 622, 540 - 634 * K * cs / 2, 565 - 622 * K * cs / 2, cs);
+  ctxQ.restore();
+
+  /* balões e corações recortados separadamente (os retângulos desviam da borda
+     inferior do círculo da foto, que no story invade a área dos corações) */
+  const eb = 0.8;
+
+  // sexo: coração 810:(66,956,92,78); balão 810:(73,996,281,130) → topo em (28,865)
+  crop(73, 996, 281, 130, 28, 865, eb);
+  crop(66, 956, 92, 78, 28 + (66 - 73) * K * eb, 865 + (956 - 996) * K * eb, eb);
+
+  // idade (balão já inclui o coração): 810:(288,1126,256,138) → topo em (403,855)
+  crop(288, 1126, 256, 138, 403, 855, eb);
+
+  // castração: balão 810:(467,997,318,153) → topo em (716,840); o coração original
+  // encosta no círculo da foto no story, então reaproveitamos o coração do sexo
+  crop(467, 997, 318, 153, 716, 840, eb);
+  crop(66, 956, 92, 78, 716 + (492 - 467) * K * eb, 840 + (955 - 997) * K * eb, eb);
+
+  // textos dos balões — centro dest = dest_origem + (centro_fonte − origem_balão) * K * eb
+  const fx = (v, o, d) => d + (v - o) * K * eb;
+  const tam = 40; // ≈ 38 * K * eb
+
+  textoAjustado(ctxQ, $('sexo').value, fx(215, 73, 28), fx(1064, 996, 865) + 13, tam, 250, PRETO);
+
+  const linhas = duasLinhas($('castracao').value || '');
+  const ccx = fx(631, 467, 716), ccy = fx(1086, 997, 840);
+  if (linhas.length === 1){
+    textoAjustado(ctxQ, linhas[0], ccx, ccy + 13, tam, 280, PRETO);
+  } else {
+    textoAjustado(ctxQ, linhas[0], ccx, ccy - 9, tam, 280, PRETO);
+    textoAjustado(ctxQ, linhas[1], ccx, ccy + 36, tam, 280, PRETO);
+  }
+
+  textoAjustado(ctxQ, $('idade').value || '', fx(417, 288, 403), fx(1219, 1126, 855) + 13, tam, 230, PRETO);
+
+  // contato + @
+  textoAjustado(ctxQ, `Entre em contato:  ${$('contato').value || ''}`, 540, 1042, 32, 940, '#fdfcfc');
+  ctxQ.save();
+  try { ctxQ.letterSpacing = '6px'; } catch(e){}
+  textoAjustado(ctxQ, $('handle').value || '', 545, 1070, 15, 400, '#fff7e8');
+  ctxQ.restore();
 }
+
+function desenhar(){ desenharStory(); desenharQuadrado(); }
 
 async function rebuildFoto(){
   if (renderPendente) return;
@@ -304,19 +403,59 @@ $('mensagem').addEventListener('input', () => { msgEditada = true; });
 
 $('btnCopiar').addEventListener('click', async () => {
   await navigator.clipboard.writeText($('mensagem').value);
-  const s = $('status'); s.textContent = '✓ Mensagem copiada — cole como legenda no WhatsApp.'; s.className = 'ok';
+  status_('✓ Mensagem copiada — cole como legenda no WhatsApp.', 'ok');
 });
 
-$('btnBaixar').addEventListener('click', async () => {
-  desenhar();
-  const blob = await new Promise(r => cv.toBlob(r, 'image/jpeg', 0.92));
+function status_(msg, cls){ const s = $('status'); s.textContent = msg; s.className = cls || ''; }
+
+function nomeArquivo(sufixo){
   const nome = ($('nome').value || 'gato').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '')
     .replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'gato';
+  return `adote-${nome}-${sufixo}.jpg`;
+}
+
+function jpegBlob(canvas){
+  return new Promise(r => canvas.toBlob(r, 'image/jpeg', 0.92));
+}
+
+function baixarBlob(blob, nome){
   const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob); a.download = `adote-${nome}.jpg`;
+  a.href = URL.createObjectURL(blob); a.download = nome;
   document.body.appendChild(a); a.click(); a.remove();
-  const s = $('status'); s.textContent = '✓ Imagem baixada — anexe no WhatsApp.'; s.className = 'ok';
+}
+
+$('btnStory').addEventListener('click', async () => {
+  desenhar();
+  baixarBlob(await jpegBlob(cvS), nomeArquivo('story'));
+  status_('✓ Story baixado.', 'ok');
 });
+$('btnQuad').addEventListener('click', async () => {
+  desenhar();
+  baixarBlob(await jpegBlob(cvQ), nomeArquivo('quadrado'));
+  status_('✓ Quadrado baixado.', 'ok');
+});
+$('btnAmbos').addEventListener('click', async () => {
+  desenhar();
+  baixarBlob(await jpegBlob(cvS), nomeArquivo('story'));
+  setTimeout(async () => {
+    baixarBlob(await jpegBlob(cvQ), nomeArquivo('quadrado'));
+    status_('✓ Os dois baixados.', 'ok');
+  }, 400);
+});
+
+/* ---------- prévia grande ---------- */
+$('btnPreview').addEventListener('click', async () => {
+  desenhar();
+  const modal = $('modal');
+  modal.querySelectorAll('img').forEach(i => i.remove());
+  for (const c of [cvS, cvQ]){
+    const img = document.createElement('img');
+    img.src = URL.createObjectURL(await jpegBlob(c));
+    modal.appendChild(img);
+  }
+  modal.classList.add('aberto');
+});
+$('modal').addEventListener('click', () => $('modal').classList.remove('aberto'));
 
 /* ---------- init ---------- */
 atualizarMensagem();
