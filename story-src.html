@@ -382,24 +382,44 @@ function baixarBlob(blob, nome){
   document.body.appendChild(a); a.click(); a.remove();
 }
 
-$('btnStory').addEventListener('click', async () => {
+/* Em celular/tablet, usa o menu nativo de compartilhar (a imagem vai direto pro
+   WhatsApp ou pra galeria via "Salvar imagem"). Em computador, baixa o arquivo. */
+const arquivoTeste = new File([new Blob(['x'], { type: 'image/jpeg' })], 't.jpg', { type: 'image/jpeg' });
+const usaCompartilhar = !!(navigator.canShare && navigator.canShare({ files: [arquivoTeste] })
+  && matchMedia('(pointer: coarse)').matches);
+
+async function entregar(itens){ // itens: [{canvas, sufixo}]
   desenhar();
-  baixarBlob(await jpegBlob(cvS), nomeArquivo('story'));
-  status_('✓ Story baixado.', 'ok');
-});
-$('btnPost').addEventListener('click', async () => {
-  desenhar();
-  baixarBlob(await jpegBlob(cvP), nomeArquivo('post'));
-  status_('✓ Post baixado.', 'ok');
-});
-$('btnAmbos').addEventListener('click', async () => {
-  desenhar();
-  baixarBlob(await jpegBlob(cvS), nomeArquivo('story'));
-  setTimeout(async () => {
-    baixarBlob(await jpegBlob(cvP), nomeArquivo('post'));
-    status_('✓ Os dois baixados.', 'ok');
-  }, 400);
-});
+  const files = [];
+  for (const it of itens){
+    files.push(new File([await jpegBlob(it.canvas)], nomeArquivo(it.sufixo), { type: 'image/jpeg' }));
+  }
+  if (usaCompartilhar){
+    try {
+      await navigator.share({ files, title: 'Adoção — Projeto Bigodes' });
+      status_('✓ Enviado pelo menu de compartilhar.', 'ok');
+      return;
+    } catch(e){
+      if (e.name === 'AbortError'){ status_('Compartilhamento cancelado.'); return; }
+      // se o compartilhar falhar por outro motivo, cai no download
+    }
+  }
+  files.forEach((f, i) => setTimeout(() => baixarBlob(f, f.name), i * 400));
+  status_(files.length > 1 ? '✓ Os dois baixados.' : '✓ Baixado.', 'ok');
+}
+
+$('btnStory').addEventListener('click', () => entregar([{ canvas: cvS, sufixo: 'story' }]));
+$('btnPost').addEventListener('click', () => entregar([{ canvas: cvP, sufixo: 'post' }]));
+$('btnAmbos').addEventListener('click', () =>
+  entregar([{ canvas: cvS, sufixo: 'story' }, { canvas: cvP, sufixo: 'post' }]));
+
+if (usaCompartilhar){
+  $('btnStory').textContent = 'Enviar Story (1080×1920)';
+  $('btnPost').textContent = 'Enviar Post (1080×1350)';
+  $('btnAmbos').textContent = 'Enviar os dois';
+  document.querySelector('.aviso').textContent =
+    'O botão “Enviar” abre o menu do celular: toque no WhatsApp pra mandar direto, ou em “Salvar imagem” pra guardar na galeria.';
+}
 
 /* ---------- prévia grande ---------- */
 $('btnPreview').addEventListener('click', async () => {
