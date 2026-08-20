@@ -40,17 +40,12 @@
   .btn-primario:hover{background:#d96e02;}
   .btn-sec{background:#EFE6D6; color:var(--escuro);}
   .btn-sec:hover{background:#e5d8c2;}
-  .btn-mini{padding:6px 10px; font-size:12px; border-radius:8px; border:1px solid var(--borda);
-    background:#fff; cursor:pointer; font-family:'Poppins',sans-serif;}
 
   .preview-col{display:flex; flex-direction:column; gap:16px;}
   .previews{display:flex; gap:16px; align-items:flex-start; flex-wrap:wrap;}
   .preview-box{background:#fff; border:1px solid var(--borda); border-radius:14px; padding:14px; flex:1; min-width:240px;}
   .preview-box p{font-size:12px; font-weight:600; color:#6b5748; margin-bottom:8px; text-align:center;}
   .preview-box canvas{width:100%; height:auto; border-radius:8px; box-shadow:0 4px 20px rgba(59,42,32,.18); display:block;}
-
-  .msg-box textarea{min-height:130px; font-size:12.5px; resize:vertical;}
-  .msg-box .top{display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;}
 
   .aviso{font-size:12px; color:#8a7a6c; margin-top:8px; line-height:1.5;}
   #status{font-size:13px; font-weight:600; margin-top:4px; min-height:18px;}
@@ -64,20 +59,20 @@
     box-shadow:0 8px 40px rgba(0,0,0,.5); vertical-align:top;}
   #modal .dica{color:#fff7e8; font-size:13px; opacity:.8; margin-bottom:6px;}
 
-  body.debug header, body.debug .painel.form, body.debug .msg-box, body.debug .preview-box p{display:none;}
+  body.debug header, body.debug .painel.form, body.debug .preview-box p{display:none;}
   body.debug .wrap{display:block; padding:0; max-width:none;}
   body.debug .previews{flex-wrap:nowrap; gap:0;}
   body.debug .preview-box{border:none; padding:0; background:none; border-radius:0; flex:none; min-width:0;}
   body.debug .preview-box canvas{border-radius:0; box-shadow:none;}
   body.debug #boxStory canvas{width:405px;}
-  body.debug #boxQuad canvas{width:540px;}
+  body.debug #boxPost canvas{width:432px;}
 </style>
 </head>
 <body>
 
 <header class="topo">
   <h1>🐾 Projeto Bigodes — Gerador de Arte de Adoção</h1>
-  <span>preencha uma vez, gere o story e o quadrado do WhatsApp</span>
+  <span>preencha uma vez, gere o story e o post nos modelos oficiais</span>
 </header>
 
 <div class="wrap">
@@ -109,22 +104,21 @@
     <label>Castração (texto do balão)</label>
     <input type="text" id="castracao" value="Castração Garantida">
 
-    <label>Nome (só para a mensagem do WhatsApp — não aparece na arte)</label>
+    <label>Nome (só para o nome do arquivo baixado)</label>
     <input type="text" id="nome" placeholder="Ex.: Frajola">
 
     <div class="linha">
-      <div><label>Contato</label><input type="text" id="contato" value="(35)9733-9504"></div>
-      <div><label>@ do Instagram</label><input type="text" id="handle" value="@projetobigodes_"></div>
+      <div><label>Contato</label><input type="text" id="contato" value="(35) 99733-9504"></div>
+      <div><label>@ do Instagram (só no story)</label><input type="text" id="handle" value="@projetobigodes_"></div>
     </div>
 
     <div class="acoes">
       <button class="btn btn-sec" id="btnPreview">👁️ Prévia em tamanho grande</button>
-      <button class="btn btn-primario" id="btnStory">⬇️ Baixar Story (1080×1920)</button>
-      <button class="btn btn-primario" id="btnQuad">⬇️ Baixar Quadrado (1080×1080)</button>
-      <button class="btn btn-primario" id="btnAmbos">⬇️⬇️ Baixar os dois</button>
+      <button class="btn btn-primario" id="btnStory">Baixar Story (1080×1920)</button>
+      <button class="btn btn-primario" id="btnPost">Baixar Post (1080×1350)</button>
+      <button class="btn btn-primario" id="btnAmbos">Baixar os dois</button>
       <div id="status"></div>
-      <p class="aviso">Ao baixar os dois, o navegador pode pedir permissão para “baixar vários arquivos” — é só permitir.
-      Depois anexe no WhatsApp e cole a mensagem pronta como legenda.</p>
+      <p class="aviso">Ao baixar os dois, o navegador pode pedir permissão para “baixar vários arquivos” — é só permitir.</p>
     </div>
   </div>
 
@@ -132,76 +126,89 @@
   <div class="preview-col">
     <div class="previews">
       <div class="preview-box" id="boxStory">
-        <p>Story / Status (1080×1920)</p>
+        <p>Story (1080×1920)</p>
         <canvas id="cvS" width="1080" height="1920"></canvas>
       </div>
-      <div class="preview-box" id="boxQuad">
-        <p>Quadrado WhatsApp (1080×1080)</p>
-        <canvas id="cvQ" width="1080" height="1080"></canvas>
+      <div class="preview-box" id="boxPost">
+        <p>Post / Feed (1080×1350)</p>
+        <canvas id="cvP" width="1080" height="1350"></canvas>
       </div>
-    </div>
-    <div class="painel msg-box">
-      <div class="top">
-        <h2>Mensagem pronta (legenda do WhatsApp)</h2>
-        <button class="btn-mini" id="btnCopiar">📋 Copiar</button>
-      </div>
-      <textarea id="mensagem" spellcheck="false"></textarea>
     </div>
   </div>
 </div>
 
 <div id="modal"><p class="dica">clique em qualquer lugar para fechar</p></div>
 
-<script type="text/plain" id="tpl"><!--SVG_MODELO--></script>
+<script type="text/plain" id="tplStory"><!--SVG_MODELO_STORY--></script>
+<script type="text/plain" id="tplFeed"><!--SVG_MODELO_FEED--></script>
 
 <script>
 "use strict";
 const $ = id => document.getElementById(id);
 const cvS = $('cvS'), ctxS = cvS.getContext('2d');
-const cvQ = $('cvQ'), ctxQ = cvQ.getContext('2d');
+const cvP = $('cvP'), ctxP = cvP.getContext('2d');
 if (new URLSearchParams(location.search).has('debug')) document.body.classList.add('debug');
 
-/* Escala: o SVG usa coordenadas 810×1440; o render base é 1080×1920 (×4/3). */
+/* Os dois SVGs usam largura 810; os canvas são 1080 de largura (×4/3). */
 const K = 1080 / 810;
+const PRETO = '#0b0a0c';
 
-/* Caixa do círculo da foto, em coordenadas locais do grupo transform(102,378) do SVG. */
-const FOTO_BOX = { x: 0.414, y: 0.527, w: 627.246, h: 615.23 };
-
-/* Transforms exatos (como estão no arquivo) dos grupos de texto variável a remover. */
-const GRUPOS_TEXTO = [
-  'matrix(1, 0, 0, 1, 105, 1034)',  // sexo
-  'matrix(1, 0, 0, 1, 522, 1026)',  // castração (2 linhas)
-  'matrix(1, 0, 0, 1, 337, 1186)',  // idade
-  'matrix(1, 0, 0, 1, 238, 1284)',  // contato (2 linhas)
-  'matrix(1, 0, 0, 1, 299, 1396)'   // @ do instagram
-];
+/* Definições de cada modelo: caixa da foto (coords locais do grupo que contém a imagem),
+   grupos de texto variável a remover (transform exato) e baselines de glifos soltos a remover. */
+const STORY = {
+  fotoBox: { x: 0.414, y: 0.527, w: 627.246, h: 615.23 },
+  matrizes: [
+    'matrix(1, 0, 0, 1, 105, 1034)',  // sexo
+    'matrix(1, 0, 0, 1, 522, 1026)',  // castração (2 linhas)
+    'matrix(1, 0, 0, 1, 337, 1186)',  // idade
+    'matrix(1, 0, 0, 1, 238, 1284)',  // contato (2 linhas)
+    'matrix(1, 0, 0, 1, 299, 1396)'   // @ do instagram
+  ],
+  baselines: []
+};
+const FEED = {
+  fotoBox: { x: 17.777, y: 0.527, w: 571.43, h: 460.68 },
+  matrizes: [
+    'matrix(1, 0, 0, 1, 322, 762)',   // castração (2 linhas)
+    'matrix(1, 0, 0, 1, 623, 715)'    // idade ("2 meses", inclinado)
+  ],
+  baselines: ['721.285742', '956.57754'] // sexo ("Indefinido") e contato (glifos soltos)
+};
 
 let fotoDataUrl = null, fotoW = 0, fotoH = 0;
-let baseImg = null;           // SVG renderizado (sem os textos variáveis)
-let msgEditada = false;
+let baseS = null, baseF = null;   // renders dos SVGs sem os textos variáveis
 let renderPendente = false;
 
-const svgOriginal = $('tpl').textContent;
 const parser = new DOMParser();
+const svgStory = $('tplStory').textContent;
+const svgFeed = $('tplFeed').textContent;
 
 function href(el){ return el.getAttribute('xlink:href') || el.getAttributeNS('http://www.w3.org/1999/xlink', 'href'); }
 
-/* Monta o SVG: remove textos variáveis e, se houver foto nova, troca a foto do círculo. */
-function montarSvg(){
-  const doc = parser.parseFromString(svgOriginal, 'image/svg+xml');
+/* Monta um SVG: remove textos variáveis e, se houver foto nova, troca a foto. */
+function montarSvg(svgText, def){
+  const doc = parser.parseFromString(svgText, 'image/svg+xml');
 
   doc.querySelectorAll('g[transform]').forEach(g => {
-    if (GRUPOS_TEXTO.includes(g.getAttribute('transform'))) g.remove();
+    const t = g.getAttribute('transform');
+    if (def.matrizes.includes(t)) { g.remove(); return; }
+    if (def.baselines.some(b => t.includes(b))){
+      // glifo solto: sobe até o <g fill="..."> que o envolve
+      let alvo = g;
+      while (alvo.parentElement && !alvo.parentElement.hasAttribute('fill')) alvo = alvo.parentElement;
+      (alvo.parentElement || alvo).remove();
+    }
   });
 
   if (fotoDataUrl){
     const imgs = [...doc.querySelectorAll('image')];
     const fotoEl = imgs.find(el => (href(el) || '').startsWith('data:image/jpeg'));
     if (fotoEl){
-      const s = Math.max(FOTO_BOX.w / fotoW, FOTO_BOX.h / fotoH) * +$('zoom').value;
+      const B = def.fotoBox;
+      const s = Math.max(B.w / fotoW, B.h / fotoH) * +$('zoom').value;
       const dw = fotoW * s, dh = fotoH * s;
-      const tx = FOTO_BOX.x + (FOTO_BOX.w - dw) / 2 + $('ox').value * (dw - FOTO_BOX.w) / 2;
-      const ty = FOTO_BOX.y + (FOTO_BOX.h - dh) / 2 + $('oy').value * (dh - FOTO_BOX.h) / 2;
+      const tx = B.x + (B.w - dw) / 2 + $('ox').value * (dw - B.w) / 2;
+      const ty = B.y + (B.h - dh) / 2 + $('oy').value * (dh - B.h) / 2;
       fotoEl.setAttribute('width', fotoW);
       fotoEl.setAttribute('height', fotoH);
       fotoEl.setAttribute('xlink:href', fotoDataUrl);
@@ -211,26 +218,43 @@ function montarSvg(){
   return new XMLSerializer().serializeToString(doc);
 }
 
-function carregarBase(){
+function renderSvg(svgText, def){
   return new Promise((resolve, reject) => {
-    const blob = new Blob([montarSvg()], { type: 'image/svg+xml' });
+    const blob = new Blob([montarSvg(svgText, def)], { type: 'image/svg+xml' });
     const url = URL.createObjectURL(blob);
     const img = new Image();
-    img.onload = () => { URL.revokeObjectURL(url); baseImg = img; resolve(); };
+    img.onload = () => { URL.revokeObjectURL(url); resolve(img); };
     img.onerror = e => { URL.revokeObjectURL(url); reject(e); };
     img.src = url;
   });
 }
 
+async function carregarBases(){
+  [baseS, baseF] = await Promise.all([renderSvg(svgStory, STORY), renderSvg(svgFeed, FEED)]);
+}
+
 /* ---------- utilidades de texto ---------- */
-function textoAjustado(ctx, texto, cx, baseY, tamanho, maxW, cor){
+function fonteAjustada(ctx, texto, tamanho, maxW){
   let t = tamanho;
   ctx.font = `700 ${t}px Poppins`;
-  while (ctx.measureText(texto).width > maxW && t > 14){
+  while (ctx.measureText(texto).width > maxW && t > 12){
     t -= 1; ctx.font = `700 ${t}px Poppins`;
   }
+}
+
+function textoAjustado(ctx, texto, cx, baseY, tamanho, maxW, cor){
+  fonteAjustada(ctx, texto, tamanho, maxW);
   ctx.fillStyle = cor; ctx.textAlign = 'center';
   ctx.fillText(texto, cx, baseY);
+}
+
+function textoInclinado(ctx, texto, cx, baseY, ang, tamanho, maxW, cor){
+  fonteAjustada(ctx, texto, tamanho, maxW);
+  ctx.save();
+  ctx.translate(cx, baseY); ctx.rotate(ang);
+  ctx.fillStyle = cor; ctx.textAlign = 'center';
+  ctx.fillText(texto, 0, 0);
+  ctx.restore();
 }
 
 function duasLinhas(texto){
@@ -245,13 +269,11 @@ function duasLinhas(texto){
   return [palavras.slice(0, melhor).join(' '), palavras.slice(melhor).join(' ')];
 }
 
-const PRETO = '#0b0a0c';
-
 /* ---------- STORY: base + textos (coordenadas no espaço 810×1440) ---------- */
 function desenharStory(){
-  if (!baseImg) return;
+  if (!baseS) return;
   ctxS.clearRect(0, 0, 1080, 1920);
-  ctxS.drawImage(baseImg, 0, 0, 1080, 1920);
+  ctxS.drawImage(baseS, 0, 0, 1080, 1920);
 
   ctxS.save();
   ctxS.scale(K, K);
@@ -279,105 +301,47 @@ function desenharStory(){
   ctxS.restore();
 }
 
-/* ---------- QUADRADO: recortes do render base remontados em 1080×1080 ----------
-   crop810: retângulo de origem no espaço 810×1440 do SVG; dest em pixels do quadrado. */
-function crop(sx, sy, sw, sh, dx, dy, escala){
-  ctxQ.drawImage(baseImg, sx * K, sy * K, sw * K, sh * K,
-    dx, dy, sw * K * escala, sh * K * escala);
-}
+/* ---------- POST/FEED: base + textos (coordenadas no espaço 810×1012.5) ---------- */
+function desenharPost(){
+  if (!baseF) return;
+  ctxP.clearRect(0, 0, 1080, 1350);
+  ctxP.drawImage(baseF, 0, 0, 1080, 1350);
 
-function desenharQuadrado(){
-  if (!baseImg) return;
-  ctxQ.fillStyle = '#670f26';
-  ctxQ.fillRect(0, 0, 1080, 1080);
+  ctxP.save();
+  ctxP.scale(K, K);
 
-  // patinhas nos cantos superiores — par da trilha do rodapé do modelo, 810:(152,1332,138,60)
-  crop(152, 1332, 138, 60, 848, 26, 1.2);
-  ctxQ.save(); ctxQ.scale(-1, 1);
-  crop(152, 1332, 138, 60, -232, 26, 1.2); // espelhado no canto esquerdo
-  ctxQ.restore();
+  // sexo — balão da esquerda
+  textoAjustado(ctxP, $('sexo').value, 150, 721.3, 35, 215, PRETO);
 
-  // logo "Bigodes adota" — fonte 810:(167,41,435,148)
-  crop(167, 41, 435, 148, 290, 26, 0.862);
-
-  // faixa "Adoção Responsável" — fonte 810:(96.78,247.2,616.7,94.2)
-  crop(96.78, 247.2, 616.7, 94.2, 190, 222, 0.8513); // 822×125.6 → 700×107
-
-  // círculo da foto com anel branco — fonte 810:(99,375,634,622); o clip elíptico
-  // descarta os topos dos corações do story que invadem os cantos do retângulo
-  const cs = 0.56;
-  ctxQ.save();
-  ctxQ.beginPath();
-  ctxQ.ellipse(540, 565, 237, 233, 0, 0, 2 * Math.PI);
-  ctxQ.clip();
-  crop(99, 375, 634, 622, 540 - 634 * K * cs / 2, 565 - 622 * K * cs / 2, cs);
-  ctxQ.restore();
-
-  /* balões e corações recortados separadamente (os retângulos desviam da borda
-     inferior do círculo da foto, que no story invade a área dos corações) */
-  const eb = 0.8;
-
-  // sexo: coração 810:(66,956,92,78); balão 810:(73,996,281,130) → topo em (28,865)
-  crop(73, 996, 281, 130, 28, 865, eb);
-  crop(66, 956, 92, 78, 28 + (66 - 73) * K * eb, 865 + (956 - 996) * K * eb, eb);
-
-  // idade (balão já inclui o coração): 810:(288,1126,256,138) → topo em (403,855)
-  crop(288, 1126, 256, 138, 403, 855, eb);
-
-  // castração: balão 810:(467,997,318,153) → topo em (716,840); o coração original
-  // encosta no círculo da foto no story, então reaproveitamos o coração do sexo
-  crop(467, 997, 318, 153, 716, 840, eb);
-  crop(66, 956, 92, 78, 716 + (492 - 467) * K * eb, 840 + (955 - 997) * K * eb, eb);
-
-  // textos dos balões — centro dest = dest_origem + (centro_fonte − origem_balão) * K * eb
-  const fx = (v, o, d) => d + (v - o) * K * eb;
-  const tam = 40; // ≈ 38 * K * eb
-
-  textoAjustado(ctxQ, $('sexo').value, fx(215, 73, 28), fx(1064, 996, 865) + 13, tam, 250, PRETO);
-
+  // castração — balão central (1 ou 2 linhas)
   const linhas = duasLinhas($('castracao').value || '');
-  const ccx = fx(631, 467, 716), ccy = fx(1086, 997, 840);
   if (linhas.length === 1){
-    textoAjustado(ctxQ, linhas[0], ccx, ccy + 13, tam, 280, PRETO);
+    textoAjustado(ctxP, linhas[0], 407, 809.3, 30, 195, PRETO);
   } else {
-    textoAjustado(ctxQ, linhas[0], ccx, ccy - 9, tam, 280, PRETO);
-    textoAjustado(ctxQ, linhas[1], ccx, ccy + 36, tam, 280, PRETO);
+    textoAjustado(ctxP, linhas[0], 407, 793.5, 30, 195, PRETO);
+    textoAjustado(ctxP, linhas[1], 407, 825.2, 30, 195, PRETO);
   }
 
-  textoAjustado(ctxQ, $('idade').value || '', fx(417, 288, 403), fx(1219, 1126, 855) + 13, tam, 230, PRETO);
+  // idade — balão da direita, texto inclinado como no modelo
+  textoInclinado(ctxP, $('idade').value || '', 687, 752.2, 0.082, 29, 145, PRETO);
 
-  // contato + @
-  textoAjustado(ctxQ, `Entre em contato:  ${$('contato').value || ''}`, 540, 1042, 32, 940, '#fdfcfc');
-  ctxQ.save();
-  try { ctxQ.letterSpacing = '6px'; } catch(e){}
-  textoAjustado(ctxQ, $('handle').value || '', 545, 1070, 15, 400, '#fff7e8');
-  ctxQ.restore();
+  // rodapé vinho
+  textoAjustado(ctxP, `Entre em contato: ${$('contato').value || ''}`, 415, 956.6, 25, 520, '#fff7e8');
+
+  ctxP.restore();
 }
 
-function desenhar(){ desenharStory(); desenharQuadrado(); }
+function desenhar(){ desenharStory(); desenharPost(); }
 
 async function rebuildFoto(){
   if (renderPendente) return;
   renderPendente = true;
   requestAnimationFrame(async () => {
     renderPendente = false;
-    await carregarBase();
+    await carregarBases();
     desenhar();
   });
 }
-
-/* ---------- mensagem pronta ---------- */
-function gerarMensagem(){
-  const n = $('nome').value;
-  const f = $('sexo').value === 'Fêmea';
-  const partes = [$('sexo').value, $('castracao').value, $('idade').value].filter(Boolean);
-  return `🐾 ${n ? `*${n}* está` : 'Gatinh' + (f ? 'a' : 'o')} para adoção!\n\n` +
-    `🐈 ${partes.join(' • ')}\n\n` +
-    `Adoção responsável pelo Projeto Bigodes. 🧡\n\n` +
-    `📩 Entre em contato: ${$('contato').value}\n` +
-    `📷 Instagram: ${$('handle').value}`;
-}
-function atualizarMensagem(){ if (!msgEditada) $('mensagem').value = gerarMensagem(); }
 
 /* ---------- eventos ---------- */
 $('foto').addEventListener('change', e => {
@@ -397,14 +361,8 @@ $('foto').addEventListener('change', e => {
 });
 
 ['zoom','ox','oy'].forEach(id => $(id).addEventListener('input', rebuildFoto));
-['sexo','idade','castracao','nome','contato','handle'].forEach(id =>
-  $(id).addEventListener('input', () => { atualizarMensagem(); desenhar(); }));
-$('mensagem').addEventListener('input', () => { msgEditada = true; });
-
-$('btnCopiar').addEventListener('click', async () => {
-  await navigator.clipboard.writeText($('mensagem').value);
-  status_('✓ Mensagem copiada — cole como legenda no WhatsApp.', 'ok');
-});
+['sexo','idade','castracao','contato','handle'].forEach(id =>
+  $(id).addEventListener('input', desenhar));
 
 function status_(msg, cls){ const s = $('status'); s.textContent = msg; s.className = cls || ''; }
 
@@ -429,16 +387,16 @@ $('btnStory').addEventListener('click', async () => {
   baixarBlob(await jpegBlob(cvS), nomeArquivo('story'));
   status_('✓ Story baixado.', 'ok');
 });
-$('btnQuad').addEventListener('click', async () => {
+$('btnPost').addEventListener('click', async () => {
   desenhar();
-  baixarBlob(await jpegBlob(cvQ), nomeArquivo('quadrado'));
-  status_('✓ Quadrado baixado.', 'ok');
+  baixarBlob(await jpegBlob(cvP), nomeArquivo('post'));
+  status_('✓ Post baixado.', 'ok');
 });
 $('btnAmbos').addEventListener('click', async () => {
   desenhar();
   baixarBlob(await jpegBlob(cvS), nomeArquivo('story'));
   setTimeout(async () => {
-    baixarBlob(await jpegBlob(cvQ), nomeArquivo('quadrado'));
+    baixarBlob(await jpegBlob(cvP), nomeArquivo('post'));
     status_('✓ Os dois baixados.', 'ok');
   }, 400);
 });
@@ -448,7 +406,7 @@ $('btnPreview').addEventListener('click', async () => {
   desenhar();
   const modal = $('modal');
   modal.querySelectorAll('img').forEach(i => i.remove());
-  for (const c of [cvS, cvQ]){
+  for (const c of [cvS, cvP]){
     const img = document.createElement('img');
     img.src = URL.createObjectURL(await jpegBlob(c));
     modal.appendChild(img);
@@ -458,11 +416,10 @@ $('btnPreview').addEventListener('click', async () => {
 $('modal').addEventListener('click', () => $('modal').classList.remove('aberto'));
 
 /* ---------- init ---------- */
-atualizarMensagem();
 (async () => {
   await document.fonts.load("700 38px Poppins").catch(() => {});
   await document.fonts.ready;
-  await carregarBase();
+  await carregarBases();
   desenhar();
 })();
 </script>
